@@ -1,7 +1,7 @@
-package ru.mirea.project.pethotelapi.repository;
+package ru.mirea.pethotel.core.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import ru.mirea.project.pethotelapi.entity.Enclosure;
+import ru.mirea.pethotel.core.entity.Enclosure;
 
 import java.util.Optional;
 

@@ -1,13 +1,13 @@
-package ru.mirea.project.pethotelapi;
+package ru.mirea.pethotel.core;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class PetHotelApiApplication {
+public class PetHotelCoreApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(PetHotelApiApplication.class, args);
+        SpringApplication.run(PetHotelCoreApplication.class, args);
     }
 
 }

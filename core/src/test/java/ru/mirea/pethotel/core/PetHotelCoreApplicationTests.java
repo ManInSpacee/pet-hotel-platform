@@ -1,10 +1,10 @@
-package ru.mirea.project.pethotelapi;
+package ru.mirea.pethotel.core;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class PetHotelApiApplicationTests {
+class PetHotelCoreApplicationTests {
 
     @Test
     void contextLoads() {

@@ -1,4 +1,4 @@
-package ru.mirea.project.pethotelapi.entity;
+package ru.mirea.pethotel.core.entity;
 
 
 import jakarta.persistence.*;
