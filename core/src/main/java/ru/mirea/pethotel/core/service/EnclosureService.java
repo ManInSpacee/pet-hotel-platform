@@ -18,7 +18,7 @@ import java.util.Optional;
 public class EnclosureService {
 
 //    private BookingRepository bookingRepo;
-    private EnclosureRepository enclosureRepo;
+    private final EnclosureRepository enclosureRepo;
 
     public EnclosureService(/*BookingRepository bookingRepo*/EnclosureRepository enclosureRepo) {
 //        this.bookingRepo = bookingRepo;
@@ -59,9 +59,9 @@ public class EnclosureService {
     }
 
     public void delete(Long enclosureId) {
-        if (enclosureRepo.findById(enclosureId).isEmpty()) {
-            throw new BusinessRuleException("Вольер для удаления не найден");
-        }
+        enclosureRepo
+                .findById(enclosureId)
+                .orElseThrow(() -> new NotFoundException("Вольер для удаления не найден"));
 //          TODO
 //        if (bookingRepo.existsByEnclosureId(enclosureId)) {
 //            throw new BusinessRuleException("Невозможно удалить вольер с существующими бронированиями");
