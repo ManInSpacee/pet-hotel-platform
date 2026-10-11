@@ -2,6 +2,7 @@ package ru.mirea.pethotel.core.service;
 
 import org.springframework.stereotype.Service;
 import ru.mirea.pethotel.core.entity.Owner;
+import ru.mirea.pethotel.core.exception.NotFoundException;
 import ru.mirea.pethotel.core.repository.OwnerRepository;
 import ru.mirea.pethotel.core.exception.BusinessRuleException;
 //import ru.mirea.project.repository.BookingRepository;
@@ -74,11 +75,11 @@ public class OwnerService {
     }
 
     public Owner getById(Long ownerId) {
-        return ownerRepo.findById(ownerId).orElseThrow(() -> new BusinessRuleException("Владелец не найден"));
+        return ownerRepo.findById(ownerId).orElseThrow(() -> new NotFoundException("Владелец не найден"));
     }
 
     public Owner getByPhone(String phone) {
-        return ownerRepo.findByPhone(phone).orElseThrow(() -> new BusinessRuleException("Владелец не найден"));
+        return ownerRepo.findByPhone(phone).orElseThrow(() -> new NotFoundException("Владелец не найден"));
     }
 
     public List<Owner> getAll() {
