@@ -62,7 +62,7 @@ public class BookingService {
     }
 
     public Booking cancel(Long bookingId) {
-        Booking booking = bookingRepo.findById(bookingId).orElseThrow(() -> new BusinessRuleException("Бронирование не найдено"));
+        Booking booking = getById(bookingId);
         if (booking.getStatus() == BookingStatus.ACCEPTED && !LocalDate.now().isBefore(booking.getStartDate())) {
             throw new BusinessRuleException("Невозможно отменить бронирование, которое уже началось");
         }
@@ -73,7 +73,7 @@ public class BookingService {
 
         validateDates(start, end);
 
-        Pet pet = petRepo.findById(petId).orElseThrow(() -> new BusinessRuleException("Питомец не найден"));
+        Pet pet = petRepo.findById(petId).orElseThrow(() -> new NotFoundException("Питомец с id " + petId + " не найден"));
         List<Enclosure> allEnclosures = enclosureRepo.findAll();
         return allEnclosures.stream()
                 .filter(enc -> enc.canHost(pet.getSize()))
@@ -83,7 +83,7 @@ public class BookingService {
 
     private Booking changeStatus(Long bookingId, BookingStatus newStatus) {
 
-        Booking booking = bookingRepo.findById(bookingId).orElseThrow(() -> new BusinessRuleException("Бронирование не найдено"));
+        Booking booking = getById(bookingId);
 
         if (!booking.getStatus().canTransitionTo(newStatus)) {
             throw new BusinessRuleException("Невозможно изменить статус бронирования из " + booking.getStatus() + " в " + newStatus);
@@ -97,8 +97,8 @@ public class BookingService {
     public Booking create(Long petId, Long enclosureId, LocalDate start, LocalDate end) {
 
         validateDates(start, end);
-        Pet pet = petRepo.findById(petId).orElseThrow(() -> new BusinessRuleException("Питомец не найден"));
-        Enclosure enclosure = enclosureRepo.findById(enclosureId).orElseThrow(() -> new BusinessRuleException("Вольер не найден"));
+        Pet pet = petRepo.findById(petId).orElseThrow(() -> new NotFoundException("Питомец с id " + petId + " не найден"));
+        Enclosure enclosure = enclosureRepo.findById(enclosureId).orElseThrow(() -> new NotFoundException("Вольер с id " + enclosureId + " не найден"));
 
         if (!enclosure.canHost(pet.getSize())) {
             throw new BusinessRuleException("Вольер не подходит для размера питомца");
@@ -111,7 +111,7 @@ public class BookingService {
     }
 
     public Booking getById(Long bookingId) {
-        return bookingRepo.findById(bookingId).orElseThrow(() -> new NotFoundException("Бронирование не найдено"));
+        return bookingRepo.findById(bookingId).orElseThrow(() -> new NotFoundException("Бронирование с id " + bookingId + " не найдено"));
     }
 
     public List<Booking> getAll() {
