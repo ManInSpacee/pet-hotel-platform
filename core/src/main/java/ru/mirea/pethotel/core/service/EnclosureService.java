@@ -7,6 +7,7 @@ import ru.mirea.pethotel.core.entity.Enclosure;
 import ru.mirea.pethotel.core.entity.EnclosureSize;
 import ru.mirea.pethotel.core.exception.BusinessRuleException;
 import ru.mirea.pethotel.core.exception.NotFoundException;
+import ru.mirea.pethotel.core.repository.BookingRepository;
 import ru.mirea.pethotel.core.repository.EnclosureRepository;
 //import ru.mirea.project.repository.BookingRepository;
 //import ru.mirea.project.repository.EnclosureRepository;
@@ -17,11 +18,11 @@ import java.util.Optional;
 @Service
 public class EnclosureService {
 
-//    private BookingRepository bookingRepo;
+    private final BookingRepository bookingRepo;
     private final EnclosureRepository enclosureRepo;
 
-    public EnclosureService(/*BookingRepository bookingRepo*/EnclosureRepository enclosureRepo) {
-//        this.bookingRepo = bookingRepo;
+    public EnclosureService(BookingRepository bookingRepo, EnclosureRepository enclosureRepo) {
+        this.bookingRepo = bookingRepo;
         this.enclosureRepo = enclosureRepo;
     }
 
@@ -62,10 +63,9 @@ public class EnclosureService {
         enclosureRepo
                 .findById(enclosureId)
                 .orElseThrow(() -> new NotFoundException("Вольер для удаления не найден"));
-//          TODO
-//        if (bookingRepo.existsByEnclosureId(enclosureId)) {
-//            throw new BusinessRuleException("Невозможно удалить вольер с существующими бронированиями");
-//        }
+        if (bookingRepo.existsByEnclosureId(enclosureId)) {
+            throw new BusinessRuleException("Невозможно удалить вольер с существующими бронированиями");
+        }
         enclosureRepo.deleteById(enclosureId);
     }
 

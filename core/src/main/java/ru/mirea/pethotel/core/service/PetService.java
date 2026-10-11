@@ -1,6 +1,5 @@
 package ru.mirea.pethotel.core.service;
 
-//import ru.mirea.project.repository.BookingRepository;
 
 import org.springframework.stereotype.Service;
 import ru.mirea.pethotel.core.entity.EnclosureSize;
@@ -9,6 +8,7 @@ import ru.mirea.pethotel.core.entity.Pet;
 import ru.mirea.pethotel.core.entity.Species;
 import ru.mirea.pethotel.core.exception.BusinessRuleException;
 import ru.mirea.pethotel.core.exception.NotFoundException;
+import ru.mirea.pethotel.core.repository.BookingRepository;
 import ru.mirea.pethotel.core.repository.OwnerRepository;
 import ru.mirea.pethotel.core.repository.PetRepository;
 
@@ -18,12 +18,12 @@ import java.util.List;
 public class PetService {
     private final PetRepository petRepo;
     private final OwnerRepository ownerRepo;
-//    private final BookingRepository bookingRepo;
+    private final BookingRepository bookingRepo;
 
-    public PetService(PetRepository petRepo, OwnerRepository ownerRepo /*, BookingRepository bookingRepo*/) {
+    public PetService(PetRepository petRepo, OwnerRepository ownerRepo, BookingRepository bookingRepo) {
         this.petRepo = petRepo;
         this.ownerRepo = ownerRepo;
-//        this.bookingRepo = bookingRepo;
+        this.bookingRepo = bookingRepo;
     }
 
     private void validatePetData(Long ownerId, String name, Species species, EnclosureSize size) {
@@ -95,10 +95,9 @@ public class PetService {
 
     public void delete(Long petId) {
         getById(petId);
-//        TODO
-//        if (bookingRepo.existsByPetId(petId)) {
-//            throw new BusinessRuleException("Невозможно удалить питомца с существующими бронированиями");
-//        }
+        if (bookingRepo.existsByPetId(petId)) {
+            throw new BusinessRuleException("Невозможно удалить питомца с существующими бронированиями");
+        }
         petRepo.deleteById(petId);
     }
 }

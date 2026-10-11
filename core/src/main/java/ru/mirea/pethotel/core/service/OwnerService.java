@@ -3,6 +3,7 @@ package ru.mirea.pethotel.core.service;
 import org.springframework.stereotype.Service;
 import ru.mirea.pethotel.core.entity.Owner;
 import ru.mirea.pethotel.core.exception.NotFoundException;
+import ru.mirea.pethotel.core.repository.BookingRepository;
 import ru.mirea.pethotel.core.repository.OwnerRepository;
 import ru.mirea.pethotel.core.exception.BusinessRuleException;
 //import ru.mirea.project.repository.BookingRepository;
@@ -12,11 +13,11 @@ import java.util.List;
 @Service
 public class OwnerService {
     private final OwnerRepository ownerRepo;
-//    private final BookingRepository bookingRepo;
+    private final BookingRepository bookingRepo;
 
-    public OwnerService(OwnerRepository ownerRepo/*, TODO BookingRepository bookingRepo*/) {
+    public OwnerService(OwnerRepository ownerRepo, BookingRepository bookingRepo) {
         this.ownerRepo = ownerRepo;
-//        this.bookingRepo = bookingRepo;
+        this.bookingRepo = bookingRepo;
     }
 
     public void validateLogin(String login) {
@@ -105,11 +106,9 @@ public class OwnerService {
     }
     public void delete(Long ownerId) {
         getById(ownerId);
-
-//        TODO
-        //        if (!bookingRepo.findByOwnerId(ownerId).isEmpty()) {
-//            throw new BusinessRuleException("Невозможно удалить владельца с существующими бронированиями");
-//        }
+        if (!bookingRepo.findByPetOwnerId(ownerId).isEmpty()) {
+            throw new BusinessRuleException("Невозможно удалить владельца с существующими бронированиями");
+        }
         ownerRepo.deleteById(ownerId);
     }
 
