@@ -1,6 +1,7 @@
  package ru.mirea.pethotel.core.service;
 
 
+import org.springframework.stereotype.Service;
 import ru.mirea.pethotel.core.entity.Booking;
 import ru.mirea.pethotel.core.entity.BookingStatus;
 import ru.mirea.pethotel.core.entity.Enclosure;
@@ -17,6 +18,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class BookingService {
 
     private final BookingRepository bookingRepo;
