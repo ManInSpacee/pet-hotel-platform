@@ -51,7 +51,7 @@ public class Booking {
 
     @Override
     public String toString() {
-        return "[ ID: " + id + ", питомец: " + this.getId() + ", вольер: " + this.getEnclosureId()
+        return "[ ID: " + id + ", питомец: " + pet.getId() + ", вольер: " + enclosure.getId()
                 + ", " + startDate + " → " + endDate + ", " + status + "]";
     }
 
@@ -71,7 +71,7 @@ public class Booking {
         return pet;
     }
 
-    public Enclosure getEnclosureId() {
+    public Enclosure getEnclosure() {
         return enclosure;
     }
 
