@@ -1,15 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.BorderPane?>
-
 <BorderPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="ru.mirea.pethotel.desktop.controller.MainController">
     <padding>
         <Insets top="16" right="16" bottom="16" left="16"/>
     </padding>
     <center>
-        <Label fx:id="statusLabel"/>
+        <TabPane tabClosingPolicy="UNAVAILABLE">
+            <tabs>
+                <Tab text="Бронирования">
+                    <content>
+                        <TableView fx:id="bookingTable">
+                            <columns>
+                                <TableColumn fx:id="petColumn" text="Питомец"/>
+                                <TableColumn fx:id="ownerColumn" text="Владелец"/>
+                                <TableColumn fx:id="enclosureColumn" text="Вольер"/>
+                                <TableColumn fx:id="startDateColumn" text="Начало"/>
+                                <TableColumn fx:id="endDateColumn" text="Окончание"/>
+                                <TableColumn fx:id="statusColumn" text="Статус"/>
+                            </columns>
+                        </TableView>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
     </center>
 </BorderPane>
