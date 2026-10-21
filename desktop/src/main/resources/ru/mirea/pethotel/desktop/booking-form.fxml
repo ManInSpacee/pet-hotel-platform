@@ -13,11 +13,11 @@
     <HBox>
         <ComboBox fx:id="petComboBox" promptText="питомец"/>
         <ComboBox fx:id="enclosureComboBox" promptText="вольер"/>
-        <DatePicker fx:id="startDatePicker" promptText="Дата начала"/>
-        <DatePicker fx:id="endDatePicker" promptText="Дата окончания"/>
+        <DatePicker fx:id="startDatePicker" editable="false" promptText="Дата начала"/>
+        <DatePicker fx:id="endDatePicker" editable="false" promptText="Дата окончания"/>
     </HBox>
     <HBox>
-        <!--        <Button text="Сохранить" onAction="#onSaveClick"/>-->
+        <Button text="Сохранить" onAction="#onSaveClick"/>
         <Button text="Отменить" onAction="#close"/>
     </HBox>
 

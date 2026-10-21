@@ -47,7 +47,8 @@ public class Booking {
         this.createdAt = createdAt;
     }
 
-    public Booking() {}
+    public Booking() {
+    }
 
     @Override
     public String toString() {

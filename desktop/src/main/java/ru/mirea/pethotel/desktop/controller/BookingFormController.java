@@ -9,9 +9,13 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import ru.mirea.pethotel.core.entity.Enclosure;
 import ru.mirea.pethotel.core.entity.Pet;
+import ru.mirea.pethotel.core.exception.BusinessRuleException;
 import ru.mirea.pethotel.core.service.BookingService;
 import ru.mirea.pethotel.core.service.EnclosureService;
 import ru.mirea.pethotel.core.service.PetService;
+import ru.mirea.pethotel.desktop.util.Dialogs;
+
+import java.time.LocalDate;
 
 
 @Component
@@ -43,6 +47,39 @@ public class BookingFormController {
     public void close() {
         Stage stage = (Stage) petComboBox.getScene().getWindow();
         stage.close();
+    }
+
+    @FXML
+    private void onSaveClick() {
+        Pet pet = petComboBox.getValue();
+        if (pet == null) {
+            Dialogs.showError("Питомец не выбран");
+            return;
+        }
+        Enclosure enclosure = enclosureComboBox.getValue();
+        if (enclosure == null) {
+            Dialogs.showError("Вольер не выбран");
+            return;
+        }
+
+        LocalDate startDate = startDatePicker.getValue();
+        if (startDate == null) {
+            Dialogs.showError("Дата начала не выбрана");
+            return;
+        }
+        LocalDate endDate = endDatePicker.getValue();
+        if (endDate == null) {
+            Dialogs.showError("Дата окончания не выбрана");
+            return;
+        }
+        try {
+            bookingService.create(pet.getId(), enclosure.getId(), startDate, endDate);
+            close();
+        } catch (BusinessRuleException e) {
+            Dialogs.showError("Ошибка при создании бронирования: " + e.getMessage());
+        }
+
+
     }
 
     @FXML
