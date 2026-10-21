@@ -31,11 +31,12 @@ public class Enclosure {
         this.size = size;
     }
 
-    protected Enclosure() {}
+    protected Enclosure() {
+    }
 
     @Override
     public String toString() {
-        return "[ ID: " + id + ", номер: " + number + ", размер: " + size + "]";
+        return "№: " + number + " (" + size + ")";
     }
 
     public boolean canHost(EnclosureSize petSize) {

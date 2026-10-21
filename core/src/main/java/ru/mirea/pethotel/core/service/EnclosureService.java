@@ -1,7 +1,6 @@
 package ru.mirea.pethotel.core.service;
 
 //import ru.mirea.project.exception.BusinessRuleException;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import ru.mirea.pethotel.core.entity.Enclosure;
 import ru.mirea.pethotel.core.entity.EnclosureSize;
@@ -69,7 +68,7 @@ public class EnclosureService {
         enclosureRepo.deleteById(enclosureId);
     }
 
-    public List<Enclosure> findAll() {
+    public List<Enclosure> getAll() {
         return enclosureRepo.findAll();
     }
 

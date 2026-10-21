@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
 <BorderPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="ru.mirea.pethotel.desktop.controller.MainController">
     <padding>
@@ -13,16 +14,19 @@
             <tabs>
                 <Tab text="Бронирования">
                     <content>
-                        <TableView fx:id="bookingTable">
-                            <columns>
-                                <TableColumn fx:id="petColumn" text="Питомец"/>
-                                <TableColumn fx:id="ownerColumn" text="Владелец"/>
-                                <TableColumn fx:id="enclosureColumn" text="Вольер"/>
-                                <TableColumn fx:id="startDateColumn" text="Начало"/>
-                                <TableColumn fx:id="endDateColumn" text="Окончание"/>
-                                <TableColumn fx:id="statusColumn" text="Статус"/>
-                            </columns>
-                        </TableView>
+                        <VBox>
+                            <TableView fx:id="bookingTable">
+                                <columns>
+                                    <TableColumn fx:id="petColumn" text="Питомец"/>
+                                    <TableColumn fx:id="ownerColumn" text="Владелец"/>
+                                    <TableColumn fx:id="enclosureColumn" text="Вольер"/>
+                                    <TableColumn fx:id="startDateColumn" text="Начало"/>
+                                    <TableColumn fx:id="endDateColumn" text="Окончание"/>
+                                    <TableColumn fx:id="statusColumn" text="Статус"/>
+                                </columns>
+                            </TableView>
+                            <Button text="Добавить" onAction="#onAddClick"/>
+                        </VBox>
                     </content>
                 </Tab>
             </tabs>

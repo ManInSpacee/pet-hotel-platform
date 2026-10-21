@@ -38,7 +38,7 @@ public class Pet {
 
     @Override
     public String toString() {
-        return id + ": " + name + " (" + species + ", " + size + ")";
+        return name + " - " + owner.getFullName() + "(" + size + ")";
     }
 
     public Long getId() {
