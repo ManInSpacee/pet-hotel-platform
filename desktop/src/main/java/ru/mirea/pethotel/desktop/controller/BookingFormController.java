@@ -49,6 +49,7 @@ public class BookingFormController {
         stage.close();
     }
 
+
     @FXML
     private void onSaveClick() {
         Pet pet = petComboBox.getValue();

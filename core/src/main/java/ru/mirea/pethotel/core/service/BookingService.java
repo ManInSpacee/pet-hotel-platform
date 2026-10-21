@@ -1,4 +1,4 @@
- package ru.mirea.pethotel.core.service;
+package ru.mirea.pethotel.core.service;
 
 
 import org.springframework.stereotype.Service;
@@ -33,6 +33,7 @@ public class BookingService {
         this.enclosureRepo = enclosureRepo;
         this.petRepo = petRepo;
     }
+
     private void validateDates(LocalDate start, LocalDate end) {
         if (start == null || end == null) {
             throw new BusinessRuleException("Даты бронирования не могут быть пустыми");
@@ -55,6 +56,7 @@ public class BookingService {
     public Booking accept(Long bookingId) {
         return changeStatus(bookingId, BookingStatus.ACCEPTED);
     }
+
     public Booking deny(Long bookingId) {
         return changeStatus(bookingId, BookingStatus.DENIED);
     }
@@ -109,7 +111,7 @@ public class BookingService {
             throw new BusinessRuleException("Вольер уже забронирован на указанный период");
         }
 
-        return bookingRepo.save(new Booking (pet, enclosure, start, end));
+        return bookingRepo.save(new Booking(pet, enclosure, start, end));
     }
 
     public Booking getById(Long bookingId) {
@@ -121,7 +123,10 @@ public class BookingService {
     }
 
     public void delete(Long bookingId) {
-        getById(bookingId);
+        Booking booking = getById(bookingId);
+        if (booking.getStatus() != BookingStatus.PENDING) {
+            throw new BusinessRuleException("Невозможно удалить бронирование, которое не находится в состоянии PENDING");
+        }
         bookingRepo.deleteById(bookingId);
     }
 

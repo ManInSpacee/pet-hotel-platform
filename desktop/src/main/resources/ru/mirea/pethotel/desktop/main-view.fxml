@@ -26,6 +26,7 @@
                                 </columns>
                             </TableView>
                             <Button text="Добавить" onAction="#onAddClick"/>
+                            <Button text="Удалить" onAction="#onDeleteClick"/>
                         </VBox>
                     </content>
                 </Tab>

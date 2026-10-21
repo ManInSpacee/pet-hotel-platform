@@ -7,6 +7,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.stage.Modality;
@@ -16,11 +18,14 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import ru.mirea.pethotel.core.entity.Booking;
 import ru.mirea.pethotel.core.entity.BookingStatus;
+import ru.mirea.pethotel.core.exception.BusinessRuleException;
 import ru.mirea.pethotel.core.service.BookingService;
 import ru.mirea.pethotel.desktop.PetHotelFxApplication;
+import ru.mirea.pethotel.desktop.util.Dialogs;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Component
 @Scope("prototype")
@@ -72,6 +77,28 @@ public class MainController {
     }
 
     @FXML
+    public void onDeleteClick() {
+
+        try {
+            Booking selected = bookingTable.getSelectionModel().getSelectedItem();
+            if (selected == null) {
+                Dialogs.showError("Выберите бронирование для удаления");
+                return;
+            }
+
+            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+            confirm.setHeaderText("Удалить Бронирование >> " + selected.getPet().getName() + " ?");
+            Optional<ButtonType> answer = confirm.showAndWait();
+            if (answer.filter(b -> b == ButtonType.OK).isPresent()) {
+                bookingService.delete(selected.getId());
+                refreshBookings();
+            }
+        } catch (BusinessRuleException e) {
+            Dialogs.showError("Ошибка при удалении бронирования: " + e.getMessage());
+        }
+    }
+
+    @FXML
     public void onAddClick() throws IOException {
         FXMLLoader loader = new FXMLLoader(PetHotelFxApplication.class.getResource("booking-form.fxml"));
         loader.setControllerFactory(context::getBean);
@@ -82,10 +109,5 @@ public class MainController {
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.showAndWait();
         refreshBookings();
-//        Booking booking = form.getResult();
-//        if (updated != null) {
-//            int index = movies.indexOf(selected);
-//            movies.set(index, updated);
-//        }
     }
 }
