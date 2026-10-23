@@ -7,12 +7,12 @@ import javafx.scene.control.DatePicker;
 import javafx.stage.Stage;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import ru.mirea.pethotel.core.entity.Enclosure;
-import ru.mirea.pethotel.core.entity.Pet;
-import ru.mirea.pethotel.core.exception.BusinessRuleException;
-import ru.mirea.pethotel.core.service.BookingService;
-import ru.mirea.pethotel.core.service.EnclosureService;
-import ru.mirea.pethotel.core.service.PetService;
+import ru.mirea.pethotel.backend.domain.Enclosure;
+import ru.mirea.pethotel.backend.domain.Pet;
+import ru.mirea.pethotel.backend.error.BusinessRuleException;
+import ru.mirea.pethotel.backend.service.BookingService;
+import ru.mirea.pethotel.backend.service.EnclosureService;
+import ru.mirea.pethotel.backend.service.PetService;
 import ru.mirea.pethotel.desktop.util.Dialogs;
 
 import java.time.LocalDate;

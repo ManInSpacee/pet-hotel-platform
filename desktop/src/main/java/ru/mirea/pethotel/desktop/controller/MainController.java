@@ -16,10 +16,10 @@ import javafx.stage.Stage;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import ru.mirea.pethotel.core.entity.Booking;
-import ru.mirea.pethotel.core.entity.BookingStatus;
-import ru.mirea.pethotel.core.exception.BusinessRuleException;
-import ru.mirea.pethotel.core.service.BookingService;
+import ru.mirea.pethotel.backend.domain.Booking;
+import ru.mirea.pethotel.backend.domain.BookingStatus;
+import ru.mirea.pethotel.backend.error.BusinessRuleException;
+import ru.mirea.pethotel.backend.service.BookingService;
 import ru.mirea.pethotel.desktop.PetHotelFxApplication;
 import ru.mirea.pethotel.desktop.util.Dialogs;
 

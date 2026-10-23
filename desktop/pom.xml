@@ -18,7 +18,7 @@
     <dependencies>
         <dependency>
             <groupId>ru.mirea.pethotel</groupId>
-            <artifactId>core</artifactId>
+            <artifactId>backend</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
