@@ -1,4 +1,3 @@
-BEGIN;
 
 INSERT INTO enclosures (id, number, size) VALUES
     (1, 101, 'SMALL'),
@@ -71,4 +70,3 @@ SELECT setval(pg_get_serial_sequence('owners', 'id'), (SELECT MAX(id) FROM owner
 SELECT setval(pg_get_serial_sequence('pets', 'id'), (SELECT MAX(id) FROM pets));
 SELECT setval(pg_get_serial_sequence('bookings', 'id'), (SELECT MAX(id) FROM bookings));
 
-COMMIT;
