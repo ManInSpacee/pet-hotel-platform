@@ -21,7 +21,6 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-
     @Generated
     @Column(name = "code", nullable = false, insertable = false, updatable = false)
     private String code;
