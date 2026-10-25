@@ -36,7 +36,7 @@ class BookingServiceTest {
             LocalDate start = LocalDate.now().plusDays(20);
             LocalDate end = LocalDate.now().plusDays(40);
 
-            Booking booking = bookingService.create(2L, 3L, start, end);
+            Booking booking = bookingService.create(2L, 3L, start, end, false, null);
             assertNotNull(booking.getId());
             assertEquals(BookingStatus.PENDING, booking.getStatus());
             assertEquals(start, booking.getStartDate());
@@ -50,7 +50,7 @@ class BookingServiceTest {
             LocalDate start = LocalDate.now().plusDays(3);
             LocalDate end = LocalDate.now().plusDays(20);
 
-            BusinessRuleException e = assertThrows(BusinessRuleException.class, () -> bookingService.create(2L, 3L, start, end));
+            BusinessRuleException e = assertThrows(BusinessRuleException.class, () -> bookingService.create(2L, 3L, start, end, false, null));
             assertEquals("Вольер уже забронирован на указанный период", e.getMessage());
         }
 
@@ -61,7 +61,7 @@ class BookingServiceTest {
             LocalDate start = LocalDate.now().plusDays(20);
             LocalDate end = LocalDate.now().plusDays(40);
 
-            BusinessRuleException e = assertThrows(BusinessRuleException.class, () -> bookingService.create(1L, 2L, start, end));
+            BusinessRuleException e = assertThrows(BusinessRuleException.class, () -> bookingService.create(1L, 2L, start, end, false, null));
             assertEquals("Вольер не подходит для размера питомца", e.getMessage());
         }
 
@@ -73,7 +73,7 @@ class BookingServiceTest {
             LocalDate start = LocalDate.now().minusDays(20);
             LocalDate end = LocalDate.now().plusDays(1);
 
-            BusinessRuleException e = assertThrows(BusinessRuleException.class, () -> bookingService.create(2L, 3L, start, end));
+            BusinessRuleException e = assertThrows(BusinessRuleException.class, () -> bookingService.create(2L, 3L, start, end, false, null));
             assertEquals("Дата начала не может быть в прошлом", e.getMessage());
         }
 
@@ -84,7 +84,7 @@ class BookingServiceTest {
             LocalDate start = LocalDate.now().plusDays(20);
             LocalDate end = LocalDate.now().plusDays(21);
 
-            BusinessRuleException e = assertThrows(BusinessRuleException.class, () -> bookingService.create(2L, 3L, start, end));
+            BusinessRuleException e = assertThrows(BusinessRuleException.class, () -> bookingService.create(2L, 3L, start, end, false, null));
             assertEquals("Бронирование должно быть не менее 2 дней", e.getMessage());
         }
 
@@ -95,7 +95,7 @@ class BookingServiceTest {
             LocalDate start = LocalDate.now().plusDays(20);
             LocalDate end = LocalDate.now().plusDays(54);
 
-            BusinessRuleException e = assertThrows(BusinessRuleException.class, () -> bookingService.create(2L, 3L, start, end));
+            BusinessRuleException e = assertThrows(BusinessRuleException.class, () -> bookingService.create(2L, 3L, start, end, false, null));
             assertEquals("Бронирование должно быть не более 30 дней", e.getMessage());
         }
 
@@ -106,7 +106,7 @@ class BookingServiceTest {
             LocalDate start = null;
             LocalDate end = null;
 
-            BusinessRuleException e = assertThrows(BusinessRuleException.class, () -> bookingService.create(2L, 3L, start, end));
+            BusinessRuleException e = assertThrows(BusinessRuleException.class, () -> bookingService.create(2L, 3L, start, end, false, null));
             assertEquals("Даты бронирования не могут быть пустыми", e.getMessage());
         }
 
@@ -117,7 +117,7 @@ class BookingServiceTest {
             LocalDate start = LocalDate.now().plusDays(30);
             LocalDate end = LocalDate.now().plusDays(20);
 
-            BusinessRuleException e = assertThrows(BusinessRuleException.class, () -> bookingService.create(2L, 3L, start, end));
+            BusinessRuleException e = assertThrows(BusinessRuleException.class, () -> bookingService.create(2L, 3L, start, end, false, null));
             assertEquals("Дата окончания не может быть раньше даты начала", e.getMessage());
         }
 
@@ -128,7 +128,7 @@ class BookingServiceTest {
             LocalDate start = LocalDate.now().plusDays(20);
             LocalDate end = LocalDate.now().plusDays(30);
 
-            NotFoundException e = assertThrows(NotFoundException.class, () -> bookingService.create(20L, 3L, start, end));
+            NotFoundException e = assertThrows(NotFoundException.class, () -> bookingService.create(20L, 3L, start, end, false, null));
             assertEquals("Питомец с id 20 не найден", e.getMessage());
         }
 
@@ -139,7 +139,7 @@ class BookingServiceTest {
             LocalDate start = LocalDate.now().plusDays(20);
             LocalDate end = LocalDate.now().plusDays(30);
 
-            NotFoundException e = assertThrows(NotFoundException.class, () -> bookingService.create(2L, 30L, start, end));
+            NotFoundException e = assertThrows(NotFoundException.class, () -> bookingService.create(2L, 30L, start, end, false, null));
             assertEquals("Вольер с id 30 не найден", e.getMessage());
         }
     }

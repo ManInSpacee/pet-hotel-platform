@@ -8,8 +8,9 @@ import ru.mirea.pethotel.backend.domain.BookingStatus;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
-public interface BookingRepository extends JpaRepository<Booking, Long> {
+public interface BookingRepository extends JpaRepository<Booking, UUID> {
     List<Booking> findByPetOwnerId(Long ownerId);
     @Query("""
         select count(b) > 0

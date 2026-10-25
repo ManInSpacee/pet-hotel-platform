@@ -2,20 +2,21 @@ package ru.mirea.pethotel.backend.service;
 
 
 import org.springframework.stereotype.Service;
-import ru.mirea.pethotel.backend.domain.Booking;
-import ru.mirea.pethotel.backend.domain.BookingStatus;
-import ru.mirea.pethotel.backend.domain.Enclosure;
-import ru.mirea.pethotel.backend.domain.Pet;
+import ru.mirea.pethotel.backend.domain.*;
 import ru.mirea.pethotel.backend.error.BusinessRuleException;
 import ru.mirea.pethotel.backend.error.NotFoundException;
 import ru.mirea.pethotel.backend.repository.BookingRepository;
 import ru.mirea.pethotel.backend.repository.EnclosureRepository;
 import ru.mirea.pethotel.backend.repository.PetRepository;
+import ru.mirea.pethotel.backend.repository.TariffRepository;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,14 +25,16 @@ public class BookingService {
     private final BookingRepository bookingRepo;
     private final EnclosureRepository enclosureRepo;
     private final PetRepository petRepo;
+    private final TariffRepository tariffRepo;
     private static final int MIN_DAYS = 2;
     private static final int MAX_DAYS = 30;
     public static final List<BookingStatus> OCCUPYING_STATUSES = List.of(BookingStatus.PENDING, BookingStatus.ACCEPTED);
 
-    public BookingService(BookingRepository bookingRepo, EnclosureRepository enclosureRepo, PetRepository petRepo) {
+    public BookingService(BookingRepository bookingRepo, EnclosureRepository enclosureRepo, PetRepository petRepo, TariffRepository tariffRepo) {
         this.bookingRepo = bookingRepo;
         this.enclosureRepo = enclosureRepo;
         this.petRepo = petRepo;
+        this.tariffRepo = tariffRepo;
     }
 
     private void validateDates(LocalDate start, LocalDate end) {
@@ -53,19 +56,19 @@ public class BookingService {
     }
 
 
-    public Booking accept(Long bookingId) {
+    public Booking accept(UUID bookingId) {
         return changeStatus(bookingId, BookingStatus.ACCEPTED);
     }
 
-    public Booking deny(Long bookingId) {
+    public Booking deny(UUID bookingId) {
         return changeStatus(bookingId, BookingStatus.DENIED);
     }
 
-    public Booking complete(Long bookingId) {
+    public Booking complete(UUID bookingId) {
         return changeStatus(bookingId, BookingStatus.COMPLETED);
     }
 
-    public Booking cancel(Long bookingId) {
+    public Booking cancel(UUID bookingId) {
         Booking booking = getById(bookingId);
         if (booking.getStatus() == BookingStatus.ACCEPTED && !LocalDate.now().isBefore(booking.getStartDate())) {
             throw new BusinessRuleException("Невозможно отменить бронирование, которое уже началось");
@@ -80,12 +83,13 @@ public class BookingService {
         Pet pet = petRepo.findById(petId).orElseThrow(() -> new NotFoundException("Питомец с id " + petId + " не найден"));
         List<Enclosure> allEnclosures = enclosureRepo.findAll();
         return allEnclosures.stream()
+                .filter(Enclosure::isActive)
                 .filter(enc -> enc.canHost(pet.getSize()))
                 .filter(enc -> !bookingRepo.hasOverlappingBookings(enc.getId(), OCCUPYING_STATUSES, start, end))
                 .collect(Collectors.toList());
     }
 
-    private Booking changeStatus(Long bookingId, BookingStatus newStatus) {
+    private Booking changeStatus(UUID bookingId, BookingStatus newStatus) {
 
         Booking booking = getById(bookingId);
 
@@ -98,12 +102,15 @@ public class BookingService {
         return bookingRepo.save(booking);
     }
 
-    public Booking create(Long petId, Long enclosureId, LocalDate start, LocalDate end) {
+    public Booking create(Long petId, Long enclosureId, LocalDate start, LocalDate end, boolean specialCare, String comment) {
 
         validateDates(start, end);
         Pet pet = petRepo.findById(petId).orElseThrow(() -> new NotFoundException("Питомец с id " + petId + " не найден"));
         Enclosure enclosure = enclosureRepo.findById(enclosureId).orElseThrow(() -> new NotFoundException("Вольер с id " + enclosureId + " не найден"));
 
+        if (!enclosure.isActive()) {
+            throw new BusinessRuleException("Вольер с id: " + enclosure.getNumber() + " не активен.");
+        }
         if (!enclosure.canHost(pet.getSize())) {
             throw new BusinessRuleException("Вольер не подходит для размера питомца");
         }
@@ -111,10 +118,18 @@ public class BookingService {
             throw new BusinessRuleException("Вольер уже забронирован на указанный период");
         }
 
-        return bookingRepo.save(new Booking(pet, enclosure, start, end));
+        Tariff tariff = tariffRepo.findByEnclosureSize(enclosure.getSize()).orElseThrow(() -> new NotFoundException("Тариф для размера " + enclosure.getSize() + " не найден"));
+        long totalDays = ChronoUnit.DAYS.between(start, end);
+        BigDecimal totalPrice = tariff.getPricePerDay()
+                .multiply(BigDecimal.valueOf(totalDays));
+        if (specialCare) {
+            totalPrice = totalPrice.multiply(tariff.getSpecialCareCoefficient()).setScale(2, RoundingMode.HALF_UP);
+        }
+
+        return bookingRepo.save(new Booking(pet, enclosure, start, end, totalPrice, specialCare, comment));
     }
 
-    public Booking getById(Long bookingId) {
+    public Booking getById(UUID bookingId) {
         return bookingRepo.findById(bookingId).orElseThrow(() -> new NotFoundException("Бронирование с id " + bookingId + " не найдено"));
     }
 
@@ -122,7 +137,7 @@ public class BookingService {
         return bookingRepo.findAll();
     }
 
-    public void delete(Long bookingId) {
+    public void delete(UUID bookingId) {
         Booking booking = getById(bookingId);
         if (booking.getStatus() != BookingStatus.PENDING) {
             throw new BusinessRuleException("Невозможно удалить бронирование, которое не находится в состоянии PENDING");

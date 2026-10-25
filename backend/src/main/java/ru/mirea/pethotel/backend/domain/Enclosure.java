@@ -18,6 +18,9 @@ public class Enclosure {
     @Column(name = "size", nullable = false)
     private EnclosureSize size;
 
+    @Column(name = "active", nullable = false)
+    private boolean active = true;
+
     public Enclosure(int number, EnclosureSize size) {
         this.number = number;
         this.size = size;
@@ -53,5 +56,13 @@ public class Enclosure {
 
     public Long getId() {
         return id;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

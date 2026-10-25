@@ -74,7 +74,7 @@ public class BookingFormController {
             return;
         }
         try {
-            bookingService.create(pet.getId(), enclosure.getId(), startDate, endDate);
+            bookingService.create(pet.getId(), enclosure.getId(), startDate, endDate, false, null);
             close();
         } catch (BusinessRuleException e) {
             Dialogs.showError("Ошибка при создании бронирования: " + e.getMessage());

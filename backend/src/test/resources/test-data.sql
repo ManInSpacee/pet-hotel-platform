@@ -1,3 +1,4 @@
+DELETE FROM booking_tags;
 DELETE FROM bookings;
 DELETE FROM pets;
 DELETE FROM owners;
@@ -16,5 +17,6 @@ INSERT INTO enclosures (id, number, size) VALUES
     (2, 2, 'MEDIUM'),
     (3, 3, 'LARGE');
 
-INSERT INTO bookings (id, pet_id, enclosure_id, start_date, end_date, status) VALUES
-    (1, 1, 3, CURRENT_DATE + 1, CURRENT_DATE + 10, 'ACCEPTED');
+-- id, code, created_at и updated_at заполняет база; тарифы берутся из миграции V3
+INSERT INTO bookings (pet_id, enclosure_id, start_date, end_date, status, total_price, updated_at) VALUES
+    (1, 3, CURRENT_DATE + 1, CURRENT_DATE + 10, 'ACCEPTED', 7200.00, CURRENT_TIMESTAMP);
