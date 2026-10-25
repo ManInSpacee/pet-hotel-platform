@@ -11,7 +11,12 @@ public record CreateBookingRequest(
         @NotNull Long enclosureId,
         @NotNull @FutureOrPresent LocalDate startDate,
         @NotNull LocalDate endDate,
-        boolean specialCare,
+        Boolean specialCare,
         @Size(max = 500) String comment
 ) {
+    public CreateBookingRequest {
+        if (specialCare == null) {
+            specialCare = false;
+        }
+    }
 }
