@@ -171,9 +171,45 @@ desktop/src/main/resources/ru/mirea/pethotel/desktop/
 10. **Администрирование** (только для роли ADMIN) — пользователи, тарифы, вольеры, журнал аудита.
 11. **CSS** — оформление кнопок, таблиц, форм в `app.css`.
 
-### 3.4. Контракт с backend (черновик, уточняется)
+### 3.4. Контракт с backend
 
-Адреса и поля DTO договариваем с Климом. Когда эндпоинт готов — он появится в Swagger: `http://localhost:8080/swagger-ui.html`.
+**Уже работает** (без авторизации, она появится позже):
+
+| Действие | Запрос | Ответ |
+|---|---|---|
+| список броней | `GET /api/bookings` | 200, массив `BookingResponse` |
+| одна бронь | `GET /api/bookings/{id}` | 200, `BookingResponse`; 404 если нет |
+| создать | `POST /api/bookings`, тело `CreateBookingRequest` | 201, `BookingResponse` |
+| удалить (только PENDING) | `DELETE /api/bookings/{id}` | 204 |
+
+`CreateBookingRequest` — что отправляет клиент:
+```json
+{ "petId": 1, "enclosureId": 3, "startDate": "2026-11-14", "endDate": "2026-11-21",
+  "specialCare": true, "comment": "текст до 500 символов" }
+```
+`specialCare` и `comment` можно не присылать.
+
+`BookingResponse` — что приходит:
+```json
+{ "id": "0c5db73a-f597-4d6a-b351-26236149ad5f", "code": "BK-000045",
+  "petId": 1, "petName": "Рекс", "ownerName": "Анна Смирнова",
+  "enclosureId": 3, "enclosureNumber": 103,
+  "startDate": "2026-11-14", "endDate": "2026-11-21",
+  "status": "PENDING", "stage": "NOT_APPLICABLE",
+  "totalPrice": 6720.00, "specialCare": true, "comment": "текст", "tags": [],
+  "archived": false, "archivedAt": null,
+  "createdAt": "2026-10-25T18:33:14", "updatedAt": "2026-10-25T18:33:14", "version": 0 }
+```
+- `status`: PENDING, ACCEPTED, DENIED, CANCELLED, COMPLETED;
+- `stage` (вычисляется сервером): NOT_APPLICABLE, UPCOMING, IN_HOTEL, FINISHED;
+- `version` — **сохранить** и присылать обратно при изменении брони (защита от одновременного редактирования, иначе 409).
+
+**Любая ошибка** приходит в одном формате — показывать пользователю `message`, а при ошибках полей — ещё и `fields`:
+```json
+{ "status": 400, "message": "Ошибка валидации", "fields": { "startDate": "не должно равняться null" } }
+```
+
+**Планируется** — адреса и поля уточняются. Когда эндпоинт готов, он появится в Swagger: `http://localhost:8080/swagger-ui.html`.
 
 | Действие | Запрос |
 |---|---|
