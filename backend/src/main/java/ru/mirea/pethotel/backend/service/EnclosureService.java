@@ -72,4 +72,8 @@ public class EnclosureService {
         return enclosureRepo.findAll();
     }
 
+    public Enclosure getById(Long enclosureId) {
+        return enclosureRepo.findById(enclosureId).orElseThrow(() -> new NotFoundException("Вольер с id " + enclosureId + " не найден"));
+    }
+
 }
