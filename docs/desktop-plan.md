@@ -215,7 +215,18 @@ desktop/src/main/resources/ru/mirea/pethotel/desktop/
 | список броней | `GET /api/bookings` | 200, массив `BookingResponse` |
 | одна бронь | `GET /api/bookings/{id}` | 200, `BookingResponse`; 404 если нет |
 | создать | `POST /api/bookings`, тело `CreateBookingRequest` | 201, `BookingResponse` |
+| изменить (только PENDING и ACCEPTED) | `PUT /api/bookings/{id}`, тело `UpdateBookingRequest` | 200, `BookingResponse` с новой ценой и версией; 409 если версия устарела |
 | удалить (только PENDING) | `DELETE /api/bookings/{id}` | 204 |
+| питомцы | `GET /api/pets`, `GET /api/pets/{id}` | `{ "id", "ownerName", "name", "species", "size" }` |
+| вольеры | `GET /api/enclosures`, `GET /api/enclosures/{id}` | `{ "id", "number", "size", "active" }` |
+| владельцы | `GET /api/owners`, `GET /api/owners/{id}` | `{ "id", "login", "fullName", "phone" }` |
+
+`UpdateBookingRequest` — полное новое состояние (форма отправляет все поля, питомца менять нельзя):
+```json
+{ "enclosureId": 3, "startDate": "2026-11-14", "endDate": "2026-11-21",
+  "specialCare": false, "comment": "текст или null", "version": 0 }
+```
+`version` — та, что пришла в `BookingResponse` при загрузке. После успешного `PUT` версия растёт на 1.
 
 `CreateBookingRequest` — что отправляет клиент:
 ```json
