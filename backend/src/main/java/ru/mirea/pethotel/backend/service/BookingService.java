@@ -115,7 +115,7 @@ public class BookingService {
     }
 
     private Enclosure getAvailableEnclosure(long enclosureId, EnclosureSize petSize, LocalDate start, LocalDate end, UUID excludeId) {
-        Enclosure enclosure = enclosureRepo.findById(enclosureId).orElseThrow(() -> new NotFoundException("Вольер не найден"));
+        Enclosure enclosure = enclosureRepo.findById(enclosureId).orElseThrow(() -> new NotFoundException("Вольер с id " + enclosureId + " не найден"));
         if (!enclosure.isActive()) {
             throw new BusinessRuleException("Вольер с id: " + enclosure.getNumber() + " не активен.");
         }
