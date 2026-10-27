@@ -1,6 +1,7 @@
 package ru.mirea.pethotel.backend.service;
 
 
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import ru.mirea.pethotel.backend.domain.*;
 import ru.mirea.pethotel.backend.error.BusinessRuleException;
@@ -35,6 +36,17 @@ public class BookingService {
         this.enclosureRepo = enclosureRepo;
         this.petRepo = petRepo;
         this.tariffRepo = tariffRepo;
+    }
+
+    private BigDecimal calculateTotalPrice(Enclosure enclosure, LocalDate start, LocalDate end, boolean specialCare) {
+        Tariff tariff = tariffRepo.findByEnclosureSize(enclosure.getSize()).orElseThrow(() -> new NotFoundException("Тариф для размера " + enclosure.getSize() + " не найден"));
+        long totalDays = ChronoUnit.DAYS.between(start, end);
+
+        BigDecimal result = tariff.getPricePerDay().multiply(BigDecimal.valueOf(totalDays));
+        if (specialCare) {
+            return result.multiply(tariff.getSpecialCareCoefficient()).setScale(2, RoundingMode.HALF_UP);
+        }
+        return result;
     }
 
     private void validateDates(LocalDate start, LocalDate end) {
@@ -85,7 +97,7 @@ public class BookingService {
         return allEnclosures.stream()
                 .filter(Enclosure::isActive)
                 .filter(enc -> enc.canHost(pet.getSize()))
-                .filter(enc -> !bookingRepo.hasOverlappingBookings(enc.getId(), OCCUPYING_STATUSES, start, end))
+                .filter(enc -> !bookingRepo.hasOverlappingBookings(enc.getId(), OCCUPYING_STATUSES, start, end, null))
                 .collect(Collectors.toList());
     }
 
@@ -102,31 +114,51 @@ public class BookingService {
         return bookingRepo.save(booking);
     }
 
+    private Enclosure getAvailableEnclosure(long enclosureId, EnclosureSize petSize, LocalDate start, LocalDate end, UUID excludeId) {
+        Enclosure enclosure = enclosureRepo.findById(enclosureId).orElseThrow(() -> new NotFoundException("Вольер не найден"));
+        if (!enclosure.isActive()) {
+            throw new BusinessRuleException("Вольер с id: " + enclosure.getNumber() + " не активен.");
+        }
+        if (!enclosure.canHost(petSize)) {
+            throw new BusinessRuleException("Вольер не подходит для размера питомца");
+        }
+        if (bookingRepo.hasOverlappingBookings(enclosure.getId(), OCCUPYING_STATUSES, start, end, excludeId)) {
+            throw new BusinessRuleException("Вольер уже забронирован на указанный период");
+        }
+        return enclosure;
+    }
+
     public Booking create(Long petId, Long enclosureId, LocalDate start, LocalDate end, boolean specialCare, String comment) {
 
         validateDates(start, end);
         Pet pet = petRepo.findById(petId).orElseThrow(() -> new NotFoundException("Питомец с id " + petId + " не найден"));
-        Enclosure enclosure = enclosureRepo.findById(enclosureId).orElseThrow(() -> new NotFoundException("Вольер с id " + enclosureId + " не найден"));
-
-        if (!enclosure.isActive()) {
-            throw new BusinessRuleException("Вольер с id: " + enclosure.getNumber() + " не активен.");
-        }
-        if (!enclosure.canHost(pet.getSize())) {
-            throw new BusinessRuleException("Вольер не подходит для размера питомца");
-        }
-        if (bookingRepo.hasOverlappingBookings(enclosure.getId(), OCCUPYING_STATUSES, start, end)) {
-            throw new BusinessRuleException("Вольер уже забронирован на указанный период");
-        }
-
-        Tariff tariff = tariffRepo.findByEnclosureSize(enclosure.getSize()).orElseThrow(() -> new NotFoundException("Тариф для размера " + enclosure.getSize() + " не найден"));
-        long totalDays = ChronoUnit.DAYS.between(start, end);
-        BigDecimal totalPrice = tariff.getPricePerDay()
-                .multiply(BigDecimal.valueOf(totalDays));
-        if (specialCare) {
-            totalPrice = totalPrice.multiply(tariff.getSpecialCareCoefficient()).setScale(2, RoundingMode.HALF_UP);
-        }
+        Enclosure enclosure = getAvailableEnclosure(enclosureId, pet.getSize(), start, end, null);
+        BigDecimal totalPrice = calculateTotalPrice(enclosure, start, end, specialCare);
 
         return bookingRepo.save(new Booking(pet, enclosure, start, end, totalPrice, specialCare, comment));
+    }
+
+    public Booking update(UUID id, long enclosureId, LocalDate start, LocalDate end, boolean specialCare, String comment, long version) {
+        validateDates(start, end);
+        Booking booking = getById(id);
+        if (booking.getStatus() != BookingStatus.ACCEPTED && booking.getStatus() != BookingStatus.PENDING) {
+            throw new BusinessRuleException("Бронирование можно изменить только у записей со статусом ACCEPTED, PENDING");
+        }
+        if (booking.getVersion() != version) {
+            throw new ObjectOptimisticLockingFailureException(Booking.class, id);
+        }
+        Enclosure enclosure = getAvailableEnclosure(enclosureId, booking.getPet().getSize(), start, end, id);
+        BigDecimal totalPrice = calculateTotalPrice(enclosure, start, end, specialCare);
+
+        booking.setEnclosure(enclosure);
+        booking.setStartDate(start);
+        booking.setEndDate(end);
+        booking.setSpecialCare(specialCare);
+        booking.setTotalPrice(totalPrice);
+        booking.setComment(comment);
+
+        return bookingRepo.save(booking);
+
     }
 
     public Booking getById(UUID bookingId) {

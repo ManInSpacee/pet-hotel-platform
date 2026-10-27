@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.mirea.pethotel.backend.domain.Booking;
 import ru.mirea.pethotel.backend.dto.BookingResponse;
 import ru.mirea.pethotel.backend.dto.CreateBookingRequest;
+import ru.mirea.pethotel.backend.dto.UpdateBookingRequest;
 import ru.mirea.pethotel.backend.service.BookingService;
 
 import java.util.List;
@@ -29,6 +30,20 @@ class BookingController {
     @GetMapping("/{id}")
     public BookingResponse getById(@PathVariable UUID id) {
         return BookingResponse.from(bookingService.getById(id));
+    }
+
+    @PutMapping("/{id}")
+    public BookingResponse updateBooking(@PathVariable UUID id, @Valid @RequestBody UpdateBookingRequest request) {
+        Booking booking = bookingService.update(
+                id,
+                request.enclosureId(),
+                request.startDate(),
+                request.endDate(),
+                request.specialCare(),
+                request.comment(),
+                request.version()
+        );
+        return BookingResponse.from(booking);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
