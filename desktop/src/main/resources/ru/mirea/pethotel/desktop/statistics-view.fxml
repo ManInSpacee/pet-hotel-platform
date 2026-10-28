@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.VBox?>
+<VBox spacing="12" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="ru.mirea.pethotel.desktop.controller.StatisticsController">
+    <padding>
+        <Insets top="16" right="16" bottom="16" left="16"/>
+    </padding>
+
+    <Label text="Показатели" styleClass="title"/>
+    <GridPane hgap="24" vgap="8">
+        <Label text="Всего броней" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <Label fx:id="totalLabel" styleClass="value" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+        <Label text="Сейчас в гостинице" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <Label fx:id="inHotelLabel" styleClass="value" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+        <Label text="Средняя стоимость" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <Label fx:id="meanLabel" styleClass="value" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+        <Label text="Минимальная стоимость" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+        <Label fx:id="minLabel" styleClass="value" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+        <Label text="Максимальная стоимость" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+        <Label fx:id="maxLabel" styleClass="value" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+        <Label text="С особым уходом" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+        <Label fx:id="specialCareLabel" styleClass="value" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+    </GridPane>
+
+    <Label text="По статусам" styleClass="title"/>
+    <GridPane fx:id="statusGrid" hgap="24" vgap="6"/>
+</VBox>

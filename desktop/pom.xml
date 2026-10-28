@@ -17,11 +17,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>ru.mirea.pethotel</groupId>
-            <artifactId>backend</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
             <version>${javafx.version}</version>
@@ -30,6 +25,16 @@
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
             <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.19.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>2.19.2</version>
         </dependency>
     </dependencies>
 
@@ -40,7 +45,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>ru.mirea.pethotel.PetHotelDesktopApplication</mainClass>
+                    <mainClass>ru.mirea.pethotel.desktop.Launcher</mainClass>
                 </configuration>
             </plugin>
         </plugins>

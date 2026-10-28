@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <BorderPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="ru.mirea.pethotel.desktop.controller.MainController">
@@ -15,19 +16,41 @@
                 <Tab text="Бронирования">
                     <content>
                         <VBox>
-                            <TableView fx:id="bookingTable">
+                            <HBox spacing="8" styleClass="filter-bar">
+                                <TextField fx:id="searchField" promptText="Код, кличка или владелец" prefWidth="260"/>
+                                <ComboBox fx:id="statusComboBox"/>
+                                <DatePicker fx:id="fromPicker" promptText="Период с"/>
+                                <DatePicker fx:id="toPicker" promptText="Период по"/>
+                            </HBox>
+                            <TableView fx:id="bookingTable" VBox.vgrow="ALWAYS">
+                                <columnResizePolicy>
+                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                                </columnResizePolicy>
                                 <columns>
+                                    <TableColumn fx:id="codeColumn" text="Код"/>
                                     <TableColumn fx:id="petColumn" text="Питомец"/>
                                     <TableColumn fx:id="ownerColumn" text="Владелец"/>
                                     <TableColumn fx:id="enclosureColumn" text="Вольер"/>
                                     <TableColumn fx:id="startDateColumn" text="Начало"/>
                                     <TableColumn fx:id="endDateColumn" text="Окончание"/>
                                     <TableColumn fx:id="statusColumn" text="Статус"/>
+                                    <TableColumn fx:id="stageColumn" text="Стадия"/>
+                                    <TableColumn fx:id="priceColumn" text="Стоимость"/>
                                 </columns>
                             </TableView>
-                            <Button text="Добавить" onAction="#onAddClick"/>
-                            <Button text="Удалить" onAction="#onDeleteClick"/>
+                            <HBox spacing="8" styleClass="button-bar">
+                                <Button text="Добавить" onAction="#onAddClick"/>
+                                <Button text="Изменить" onAction="#onEditClick"/>
+                                <Button text="Удалить" styleClass="danger" onAction="#onDeleteClick"/>
+                                <Button text="Обновить" styleClass="secondary" onAction="#onRefreshClick"/>
+                                <Button text="Экспорт в CSV" styleClass="secondary" onAction="#onExportClick"/>
+                            </HBox>
                         </VBox>
+                    </content>
+                </Tab>
+                <Tab text="Статистика">
+                    <content>
+                        <fx:include fx:id="statistics" source="statistics-view.fxml"/>
                     </content>
                 </Tab>
             </tabs>
