@@ -12,10 +12,11 @@ import java.util.List;
 public class CsvExporter {
 
     private static final String SEPARATOR = ";";
+    private static final String BOM = "﻿";
 
     public void export(List<BookingDto> bookings, Path file) throws IOException {
         List<String> lines = new ArrayList<>();
-        lines.add(String.join(SEPARATOR, "Код", "Питомец", "Владелец", "Вольер", "Начало", "Окончание",
+        lines.add(BOM + String.join(SEPARATOR, "Код", "Питомец", "Владелец", "Вольер", "Начало", "Окончание",
                 "Статус", "Стадия", "Стоимость", "Особый уход"));
         for (BookingDto b : bookings) {
             lines.add(String.join(SEPARATOR,
