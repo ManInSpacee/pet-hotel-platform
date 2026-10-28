@@ -2,7 +2,6 @@ package ru.mirea.pethotel.desktop.api;
 
 import java.util.Map;
 
-// Ошибка от backend (или от фейка): message показываем пользователю, fields — ошибки по полям формы
 public class ApiException extends RuntimeException {
 
     private final int status;

@@ -15,7 +15,6 @@ public final class Dialogs {
         alert.showAndWait();
     }
 
-    // message от backend, а при ошибках валидации ещё и по строке на каждое поле
     public static void showError(ApiException e) {
         StringBuilder text = new StringBuilder(e.getMessage());
         e.getFields().forEach((field, problem) -> text.append("\n").append(field).append(": ").append(problem));

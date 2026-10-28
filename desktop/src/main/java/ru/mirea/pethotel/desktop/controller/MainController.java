@@ -122,7 +122,6 @@ public class MainController {
         openForm(selected);
     }
 
-    // booking == null: форма создания, иначе форма редактирования выбранной брони
     private void openForm(BookingDto booking) throws IOException {
         FXMLLoader loader = new FXMLLoader(PetHotelFxApplication.class.getResource("booking-form.fxml"));
         loader.setControllerFactory(type -> new BookingFormController(bookingApi));

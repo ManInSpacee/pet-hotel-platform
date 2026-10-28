@@ -31,8 +31,8 @@ public class HttpBookingApi implements BookingApi {
     private final HttpClient http = HttpClient.newHttpClient();
     private final ObjectMapper mapper = new ObjectMapper()
             .registerModule(new JavaTimeModule())
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)       // даты как "2026-11-14", не как массив чисел
-            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);   // в ответе есть поля, которых нет в наших DTO
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
     public HttpBookingApi() {
         this(DEFAULT_BASE_URL);
@@ -88,7 +88,6 @@ public class HttpBookingApi implements BookingApi {
         return HttpRequest.newBuilder(URI.create(baseUrl + path)).header("Accept", "application/json");
     }
 
-    // Любой не-2xx ответ превращается в ApiException с текстом ошибки от backend
     private HttpResponse<String> send(HttpRequest request) {
         HttpResponse<String> response;
         try {

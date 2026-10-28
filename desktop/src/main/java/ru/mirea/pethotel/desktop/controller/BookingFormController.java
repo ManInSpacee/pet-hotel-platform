@@ -23,7 +23,6 @@ public class BookingFormController {
 
     private final BookingApi bookingApi;
 
-    // null — форма создания, иначе редактируем эту бронь
     private BookingDto editing;
 
     @FXML
@@ -51,14 +50,13 @@ public class BookingFormController {
         stage.close();
     }
 
-    // Вызывается после загрузки FXML (когда initialize уже заполнил списки): подставляем текущие значения брони
     public void setBooking(BookingDto booking) {
         this.editing = booking;
         petComboBox.getItems().stream()
                 .filter(p -> p.id().equals(booking.petId()))
                 .findFirst()
                 .ifPresent(petComboBox::setValue);
-        petComboBox.setDisable(true);   // питомца у существующей брони менять нельзя
+        petComboBox.setDisable(true);
         enclosureComboBox.getItems().stream()
                 .filter(e -> e.id().equals(booking.enclosureId()))
                 .findFirst()
@@ -66,7 +64,7 @@ public class BookingFormController {
         startDatePicker.setValue(booking.startDate());
         endDatePicker.setValue(booking.endDate());
         specialCareCheckBox.setSelected(booking.specialCare());
-        commentArea.setText(booking.comment() == null ? "" : booking.comment());   // setText(null) ломает isBlank() при сохранении
+        commentArea.setText(booking.comment() == null ? "" : booking.comment());
     }
 
     @FXML

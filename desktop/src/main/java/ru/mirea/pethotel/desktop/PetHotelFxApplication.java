@@ -23,7 +23,6 @@ public class PetHotelFxApplication extends Application {
         stage.show();
     }
 
-    // По умолчанию данные из памяти; с backend: запуск с -Dapi=http
     private static BookingApi createApi() {
         if ("http".equals(System.getProperty("api"))) {
             return new HttpBookingApi();

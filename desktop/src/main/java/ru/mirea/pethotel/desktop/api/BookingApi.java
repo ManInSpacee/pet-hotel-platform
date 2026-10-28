@@ -11,15 +11,15 @@ import java.util.UUID;
 
 public interface BookingApi {
 
-    List<BookingDto> getAll();                                  // GET    /api/bookings
+    List<BookingDto> getAll();
 
-    BookingDto create(CreateBookingRequest request);            // POST   /api/bookings
+    BookingDto create(CreateBookingRequest request);
 
-    BookingDto update(UUID id, UpdateBookingRequest request);   // PUT    /api/bookings/{id}
+    BookingDto update(UUID id, UpdateBookingRequest request);
 
-    void delete(UUID id);                                       // DELETE /api/bookings/{id}
+    void delete(UUID id);
 
-    List<PetDto> getPets();                                     // GET    /api/pets
+    List<PetDto> getPets();
 
-    List<EnclosureDto> getEnclosures();                         // GET    /api/enclosures
+    List<EnclosureDto> getEnclosures();
 }
