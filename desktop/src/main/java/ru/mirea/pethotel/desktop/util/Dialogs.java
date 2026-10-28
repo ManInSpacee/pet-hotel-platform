@@ -1,6 +1,7 @@
 package ru.mirea.pethotel.desktop.util;
 
 import javafx.scene.control.Alert;
+import ru.mirea.pethotel.desktop.api.ApiException;
 
 public final class Dialogs {
     private Dialogs() {
@@ -12,5 +13,12 @@ public final class Dialogs {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    // message от backend, а при ошибках валидации ещё и по строке на каждое поле
+    public static void showError(ApiException e) {
+        StringBuilder text = new StringBuilder(e.getMessage());
+        e.getFields().forEach((field, problem) -> text.append("\n").append(field).append(": ").append(problem));
+        showError(text.toString());
     }
 }

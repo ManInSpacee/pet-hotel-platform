@@ -13,60 +13,65 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-import ru.mirea.pethotel.backend.domain.Booking;
-import ru.mirea.pethotel.backend.domain.BookingStatus;
-import ru.mirea.pethotel.backend.error.BusinessRuleException;
-import ru.mirea.pethotel.backend.service.BookingService;
 import ru.mirea.pethotel.desktop.PetHotelFxApplication;
+import ru.mirea.pethotel.desktop.api.ApiException;
+import ru.mirea.pethotel.desktop.api.BookingApi;
+import ru.mirea.pethotel.desktop.dto.BookingDto;
 import ru.mirea.pethotel.desktop.util.Dialogs;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 
-@Component
-@Scope("prototype")
 public class MainController {
 
-    private final BookingService bookingService;
-    private final ApplicationContext context;
+    private final BookingApi bookingApi;
     @FXML
-    private TableView<Booking> bookingTable;
+    private TableView<BookingDto> bookingTable;
     @FXML
-    private TableColumn<Booking, String> petColumn;
+    private TableColumn<BookingDto, String> codeColumn;
     @FXML
-    private TableColumn<Booking, String> ownerColumn;
+    private TableColumn<BookingDto, String> petColumn;
     @FXML
-    private TableColumn<Booking, Integer> enclosureColumn;
+    private TableColumn<BookingDto, String> ownerColumn;
     @FXML
-    private TableColumn<Booking, LocalDate> startDateColumn;
+    private TableColumn<BookingDto, Integer> enclosureColumn;
     @FXML
-    private TableColumn<Booking, LocalDate> endDateColumn;
+    private TableColumn<BookingDto, LocalDate> startDateColumn;
     @FXML
-    private TableColumn<Booking, BookingStatus> statusColumn;
+    private TableColumn<BookingDto, LocalDate> endDateColumn;
+    @FXML
+    private TableColumn<BookingDto, String> statusColumn;
+    @FXML
+    private TableColumn<BookingDto, String> stageColumn;
+    @FXML
+    private TableColumn<BookingDto, BigDecimal> priceColumn;
 
-    private final ObservableList<Booking> bookings = FXCollections.observableArrayList();
+    private final ObservableList<BookingDto> bookings = FXCollections.observableArrayList();
+
+    public MainController(BookingApi bookingApi) {
+        this.bookingApi = bookingApi;
+    }
 
     private void refreshBookings() {
-        bookings.setAll(bookingService.getAll());
+        try {
+            bookings.setAll(bookingApi.getAll());
+        } catch (ApiException e) {
+            Dialogs.showError(e);
+        }
     }
 
     private void setupColumns() {
-        petColumn.setCellValueFactory(cell -> new ReadOnlyObjectWrapper<>(cell.getValue().getPet().getName()));
-        ownerColumn.setCellValueFactory(cell -> new ReadOnlyObjectWrapper<>(cell.getValue().getPet().getOwner().getFullName()));
-        enclosureColumn.setCellValueFactory(cell -> new ReadOnlyObjectWrapper<>(cell.getValue().getEnclosure().getNumber()));
-        startDateColumn.setCellValueFactory(cell -> new ReadOnlyObjectWrapper<>(cell.getValue().getStartDate()));
-        endDateColumn.setCellValueFactory(cell -> new ReadOnlyObjectWrapper<>(cell.getValue().getEndDate()));
-        statusColumn.setCellValueFactory(cell -> new ReadOnlyObjectWrapper<>(cell.getValue().getStatus()));
-    }
-
-
-    public MainController(BookingService bookingService, ApplicationContext context) {
-        this.bookingService = bookingService;
-        this.context = context;
+        codeColumn.setCellValueFactory(cell -> new ReadOnlyObjectWrapper<>(cell.getValue().code()));
+        petColumn.setCellValueFactory(cell -> new ReadOnlyObjectWrapper<>(cell.getValue().petName()));
+        ownerColumn.setCellValueFactory(cell -> new ReadOnlyObjectWrapper<>(cell.getValue().ownerName()));
+        enclosureColumn.setCellValueFactory(cell -> new ReadOnlyObjectWrapper<>(cell.getValue().enclosureNumber()));
+        startDateColumn.setCellValueFactory(cell -> new ReadOnlyObjectWrapper<>(cell.getValue().startDate()));
+        endDateColumn.setCellValueFactory(cell -> new ReadOnlyObjectWrapper<>(cell.getValue().endDate()));
+        statusColumn.setCellValueFactory(cell -> new ReadOnlyObjectWrapper<>(cell.getValue().status()));
+        stageColumn.setCellValueFactory(cell -> new ReadOnlyObjectWrapper<>(cell.getValue().stage()));
+        priceColumn.setCellValueFactory(cell -> new ReadOnlyObjectWrapper<>(cell.getValue().totalPrice()));
     }
 
     @FXML
@@ -77,34 +82,57 @@ public class MainController {
     }
 
     @FXML
+    public void onRefreshClick() {
+        refreshBookings();
+    }
+
+    @FXML
     public void onDeleteClick() {
+        BookingDto selected = bookingTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            Dialogs.showError("Выберите бронирование для удаления");
+            return;
+        }
 
-        try {
-            Booking selected = bookingTable.getSelectionModel().getSelectedItem();
-            if (selected == null) {
-                Dialogs.showError("Выберите бронирование для удаления");
-                return;
-            }
-
-            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-            confirm.setHeaderText("Удалить Бронирование >> " + selected.getPet().getName() + " ?");
-            Optional<ButtonType> answer = confirm.showAndWait();
-            if (answer.filter(b -> b == ButtonType.OK).isPresent()) {
-                bookingService.delete(selected.getId());
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setHeaderText("Удалить бронирование " + selected.code() + " (" + selected.petName() + ")?");
+        Optional<ButtonType> answer = confirm.showAndWait();
+        if (answer.filter(b -> b == ButtonType.OK).isPresent()) {
+            try {
+                bookingApi.delete(selected.id());
                 refreshBookings();
+            } catch (ApiException e) {
+                Dialogs.showError(e);
             }
-        } catch (BusinessRuleException e) {
-            Dialogs.showError("Ошибка при удалении бронирования: " + e.getMessage());
         }
     }
 
     @FXML
     public void onAddClick() throws IOException {
+        openForm(null);
+    }
+
+    @FXML
+    public void onEditClick() throws IOException {
+        BookingDto selected = bookingTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            Dialogs.showError("Выберите бронирование для изменения");
+            return;
+        }
+        openForm(selected);
+    }
+
+    // booking == null: форма создания, иначе форма редактирования выбранной брони
+    private void openForm(BookingDto booking) throws IOException {
         FXMLLoader loader = new FXMLLoader(PetHotelFxApplication.class.getResource("booking-form.fxml"));
-        loader.setControllerFactory(context::getBean);
+        loader.setControllerFactory(type -> new BookingFormController(bookingApi));
         Parent root = loader.load();
+        BookingFormController form = loader.getController();
+        if (booking != null) {
+            form.setBooking(booking);
+        }
         Stage stage = new Stage();
-        stage.setTitle("Создание бронирования");
+        stage.setTitle(booking == null ? "Создание бронирования" : "Изменение бронирования " + booking.code());
         stage.setScene(new Scene(root));
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.showAndWait();
