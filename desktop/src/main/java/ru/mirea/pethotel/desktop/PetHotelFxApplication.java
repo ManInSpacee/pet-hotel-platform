@@ -22,6 +22,7 @@ public class PetHotelFxApplication extends Application {
         Scene scene = new Scene(loader.load(), 1100, 700);
         Styles.apply(scene);
         stage.setTitle("Pet Hotel");
+        Styles.applyIcon(stage);
         stage.setScene(scene);
         stage.show();
     }

@@ -184,6 +184,7 @@ public class MainController {
         Scene scene = new Scene(root);
         Styles.apply(scene);
         stage.setScene(scene);
+        Styles.applyIcon(stage);
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.showAndWait();
         refreshBookings();
