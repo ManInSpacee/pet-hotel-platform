@@ -180,7 +180,7 @@ desktop/src/main/resources/ru/mirea/pethotel/desktop/
 #### Следующая задача: клиент по REST (28.10)
 
 Твои `BookingDto`, `BookingApi`, `FakeBookingApi`, `BookingStatistics` — хорошая основа. Теперь клиент
-переходит на настоящий backend. Порядок важен: шаги 1–3 — общий фундамент, после них Клим переводит контроллеры.
+переходит на настоящий backend. Порядок важен: шаги 1–3 — фундамент, без них остальное не собрать.
 
 1. **Влей свою ветку в `main`** (или открой PR) — чтобы `BookingApi` и `BookingDto` стали общими.
 2. **Убери из `desktop` Spring и зависимость от `backend`.** Клиент больше не ходит в базу.
@@ -204,7 +204,7 @@ desktop/src/main/resources/ru/mirea/pethotel/desktop/
    - в `BookingDto` добавить `petId`, `enclosureId`, `comment`, `version` (без них не работает форма редактирования);
    - новые `record` в `dto`: `CreateBookingRequest`, `UpdateBookingRequest`, `PetDto`, `EnclosureDto` — поля из раздела 3.4;
    - `FakeBookingApi` дописать под все методы (список в памяти).
-   - **Запушь сразу после шага 3** — Клим начинает переводить контроллеры.
+   - **Запушь сразу после шага 3.**
 4. **`HttpBookingApi implements BookingApi`** — настоящие запросы:
    - `java.net.http.HttpClient`, базовый адрес `http://localhost:8080/api` — в константе или в `app.properties`, не размазывать по коду;
    - Jackson `ObjectMapper` с `JavaTimeModule` (иначе не поймёт `LocalDate`);
@@ -212,7 +212,21 @@ desktop/src/main/resources/ru/mirea/pethotel/desktop/
      (формат — раздел 3.4), чтобы контроллер показал его в `Dialogs.showError`;
    - проверка: маленький `main`, который вызывает `getAll()` при запущенном backend и печатает брони.
 
-Твои пункты из таблицы выше (фильтр, CSV, вкладка статистики, CSS) — после этого.
+5. **Перевести контроллеры на `BookingApi`.** `MainController` и `BookingFormController` сейчас вызывают
+   `bookingService` из backend напрямую через Spring — заменить на `bookingApi`. Ошибки `ApiException` → `Dialogs.showError(e.getMessage())`.
+   Таблица: колонки по полям `BookingDto` (код, питомец, владелец, вольер, даты, статус, стадия, стоимость).
+   Форма: питомцы и вольеры в `ComboBox` — из `getPets()` / `getEnclosures()`.
+6. **Редактирование.** Кнопка «Изменить»: выбранная бронь → та же форма, но заполненная текущими значениями
+   (питомец не меняется) → «Сохранить» → `bookingApi.update(id, new UpdateBookingRequest(..., selected.version()))`.
+   После сохранения — перезагрузить список.
+7. **Поиск, 2 фильтра, 2 сортировки** — в `MainController`, по загруженному списку:
+   `ObservableList → FilteredList → SortedList → TableView`. Предикат — из твоего `BookingFilter`.
+   Сортировка: `sortedList.comparatorProperty().bind(table.comparatorProperty())` (клик по колонкам дат и стоимости).
+
+После этого — фильтр/CSV/вкладка статистики/CSS из таблицы выше.
+
+**Всё в клиенте делаешь ты.** Клим разбирает каждый твой коммит — на защите вопросы по JavaFX могут задать любому из вас.
+Поэтому коммить маленькими шагами с понятными сообщениями.
 
 #### С чего начать прямо сейчас
 
