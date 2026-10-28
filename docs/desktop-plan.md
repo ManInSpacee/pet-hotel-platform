@@ -177,6 +177,43 @@ desktop/src/main/resources/ru/mirea/pethotel/desktop/
 Твои части не зависят от `ApiClient`: делай их на `FakeBookingApi` со списком в памяти,
 а когда таблица Клима заработает по REST — подключим.
 
+#### Следующая задача: клиент по REST (28.10)
+
+Твои `BookingDto`, `BookingApi`, `FakeBookingApi`, `BookingStatistics` — хорошая основа. Теперь клиент
+переходит на настоящий backend. Порядок важен: шаги 1–3 — общий фундамент, после них Клим переводит контроллеры.
+
+1. **Влей свою ветку в `main`** (или открой PR) — чтобы `BookingApi` и `BookingDto` стали общими.
+2. **Убери из `desktop` Spring и зависимость от `backend`.** Клиент больше не ходит в базу.
+   - `desktop/pom.xml`: удалить зависимость `backend`; добавить `com.fasterxml.jackson.core:jackson-databind`
+     и `com.fasterxml.jackson.datatype:jackson-datatype-jsr310` (версия 2.19.2, как в pom из ТЗ КР2);
+   - удалить `PetHotelDesktopApplication`, `application.properties`, `database.properties`;
+   - `PetHotelFxApplication`: убрать Spring-контекст (`init`, `stop`, `setControllerFactory`) — FXML грузится обычным `FXMLLoader`;
+   - новый `Launcher` с `main`, который вызывает `Application.launch(PetHotelFxApplication.class)`;
+   - `javafx-maven-plugin` → `mainClass` = `ru.mirea.pethotel.desktop.Launcher`.
+3. **Интерфейс и DTO — общий контракт:**
+   ```java
+   public interface BookingApi {
+       List<BookingDto> getAll();                                   // GET    /api/bookings
+       BookingDto create(CreateBookingRequest request);             // POST   /api/bookings
+       BookingDto update(UUID id, UpdateBookingRequest request);    // PUT    /api/bookings/{id}
+       void delete(UUID id);                                        // DELETE /api/bookings/{id}
+       List<PetDto> getPets();                                      // GET    /api/pets
+       List<EnclosureDto> getEnclosures();                          // GET    /api/enclosures
+   }
+   ```
+   - в `BookingDto` добавить `petId`, `enclosureId`, `comment`, `version` (без них не работает форма редактирования);
+   - новые `record` в `dto`: `CreateBookingRequest`, `UpdateBookingRequest`, `PetDto`, `EnclosureDto` — поля из раздела 3.4;
+   - `FakeBookingApi` дописать под все методы (список в памяти).
+   - **Запушь сразу после шага 3** — Клим начинает переводить контроллеры.
+4. **`HttpBookingApi implements BookingApi`** — настоящие запросы:
+   - `java.net.http.HttpClient`, базовый адрес `http://localhost:8080/api` — в константе или в `app.properties`, не размазывать по коду;
+   - Jackson `ObjectMapper` с `JavaTimeModule` (иначе не поймёт `LocalDate`);
+   - ответ 2xx → разобрать JSON в DTO; иначе → бросить `ApiException` с полем `message` из JSON ошибки
+     (формат — раздел 3.4), чтобы контроллер показал его в `Dialogs.showError`;
+   - проверка: маленький `main`, который вызывает `getAll()` при запущенном backend и печатает брони.
+
+Твои пункты из таблицы выше (фильтр, CSV, вкладка статистики, CSS) — после этого.
+
 #### С чего начать прямо сейчас
 
 Главное правило: **не трогай `MainController`, `main-view.fxml` и `BookingFormController`** — Клим переделывает их под REST.
