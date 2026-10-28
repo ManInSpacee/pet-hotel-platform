@@ -16,7 +16,16 @@
                 <Tab text="Бронирования">
                     <content>
                         <VBox>
-                            <TableView fx:id="bookingTable">
+                            <HBox spacing="8" styleClass="filter-bar">
+                                <TextField fx:id="searchField" promptText="Код, кличка или владелец" prefWidth="260"/>
+                                <ComboBox fx:id="statusComboBox"/>
+                                <DatePicker fx:id="fromPicker" promptText="Период с"/>
+                                <DatePicker fx:id="toPicker" promptText="Период по"/>
+                            </HBox>
+                            <TableView fx:id="bookingTable" VBox.vgrow="ALWAYS">
+                                <columnResizePolicy>
+                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                                </columnResizePolicy>
                                 <columns>
                                     <TableColumn fx:id="codeColumn" text="Код"/>
                                     <TableColumn fx:id="petColumn" text="Питомец"/>
@@ -29,13 +38,19 @@
                                     <TableColumn fx:id="priceColumn" text="Стоимость"/>
                                 </columns>
                             </TableView>
-                            <HBox spacing="8">
+                            <HBox spacing="8" styleClass="button-bar">
                                 <Button text="Добавить" onAction="#onAddClick"/>
                                 <Button text="Изменить" onAction="#onEditClick"/>
-                                <Button text="Удалить" onAction="#onDeleteClick"/>
-                                <Button text="Обновить" onAction="#onRefreshClick"/>
+                                <Button text="Удалить" styleClass="danger" onAction="#onDeleteClick"/>
+                                <Button text="Обновить" styleClass="secondary" onAction="#onRefreshClick"/>
+                                <Button text="Экспорт в CSV" styleClass="secondary" onAction="#onExportClick"/>
                             </HBox>
                         </VBox>
+                    </content>
+                </Tab>
+                <Tab text="Статистика">
+                    <content>
+                        <fx:include fx:id="statistics" source="statistics-view.fxml"/>
                     </content>
                 </Tab>
             </tabs>

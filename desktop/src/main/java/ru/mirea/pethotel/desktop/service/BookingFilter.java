@@ -7,6 +7,7 @@ import java.util.function.Predicate;
 
 public class BookingFilter {
 
+
     public Predicate<BookingDto> build(String search, String status, LocalDate from, LocalDate to) {
         String text = search == null ? "" : search.trim().toLowerCase();
         boolean anyStatus = status == null || status.equals("ANY");

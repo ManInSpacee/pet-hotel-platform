@@ -20,7 +20,7 @@
     <TextArea fx:id="commentArea" promptText="Комментарий (до 500 символов)" prefRowCount="3" wrapText="true"/>
     <HBox>
         <Button text="Сохранить" onAction="#onSaveClick"/>
-        <Button text="Отменить" onAction="#close"/>
+        <Button text="Отменить" styleClass="secondary" onAction="#close"/>
     </HBox>
 
 </VBox>

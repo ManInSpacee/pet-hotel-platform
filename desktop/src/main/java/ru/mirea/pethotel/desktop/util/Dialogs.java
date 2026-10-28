@@ -12,6 +12,8 @@ public final class Dialogs {
         alert.setTitle("Ошибка");
         alert.setHeaderText(null);
         alert.setContentText(message);
+        Styles.apply(alert.getDialogPane());
+        alert.getDialogPane().getStyleClass().add("error-dialog");
         alert.showAndWait();
     }
 
