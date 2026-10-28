@@ -27,10 +27,11 @@ public class PetHotelFxApplication extends Application {
     }
 
     private static BookingApi createApi() {
-        if ("http".equals(System.getProperty("api"))) {
-            return new HttpBookingApi();
+        // По умолчанию — настоящий backend; данные в памяти — только с флагом -Dapi=fake
+        if ("fake".equals(System.getProperty("api"))) {
+            return new FakeBookingApi();
         }
-        return new FakeBookingApi();
+        return new HttpBookingApi();
     }
 
     private static Object createController(Class<?> type, BookingApi api) {
